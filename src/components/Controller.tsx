@@ -7,7 +7,7 @@ function Controller(props){
       backgroundImage: `url(${props.data.artWork})`,
     };
     const [paused,setPaused] = useState(true)
-    const {audio,playlist,setMusicMeta,data} = props
+    const {audio,playlist,setMusicMeta,data,musicState,setMusicState,handleNext} = props
     
     useEffect(() => {
         audio.current?.addEventListener("pause", function(){ 
@@ -35,13 +35,6 @@ function Controller(props){
     const closeModal = () => {
     setModalOpen(false);
     };
-    const handleNext=(e)=>{
-        e.stopPropagation()
-        const index = playlist.findIndex((e) => data.id == e.id )
-        const nextIndex = index + 1
-        if(!playlist[nextIndex]) return;
-        setMusicMeta(playlist[nextIndex])
-    }
     return(
         <>
         <Playlist open={modalOpen} 
@@ -52,7 +45,10 @@ function Controller(props){
                   audio={audio}
                   playlist={playlist}
                   setMusicMeta={setMusicMeta}
-                  handleNext={handleNext}/>
+                  handleNext={handleNext}
+                  musicState={musicState}
+                  setMusicState={setMusicState}
+                  setPlayList={props.setPlayList}/>
         <div className='controller' onClick={openModal}>
             <div id='controllerArtWork'style={CAStyle}/>
             <div className='title'>{props.data.title}</div>

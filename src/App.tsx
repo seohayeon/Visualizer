@@ -31,6 +31,10 @@ function App(){
                 objCount: 150,
                 data: []
             })
+        const [musicState,setMusicState] = useState({
+            shuffle:false,
+            loop:false
+        })
         const [musicMeta,setMusicMeta] = useState<musicMetaType>({
             id:null,
             title:'---',
@@ -42,7 +46,7 @@ function App(){
         const audioContextRef = useRef<AudioContext>();
         const frequencyDataRef = useRef<Uint8Array>();
         const analyserRef = useRef<AnalyserNode>();
-        const [playlist,setPlayList] = useState([])
+        const [playlist,setPlayList] = useState([]);
         const nextId = useRef(0);
         
         const thiefColor = (img) => {
@@ -95,7 +99,6 @@ function App(){
             audioContext.resume().then(() => {
                  const audio:HTMLAudioElement = audioRef.current;
             })
-            //audio.play()
         }
         
         useEffect(() => {
@@ -183,18 +186,35 @@ function App(){
         const style={
             backgroundColor:color.main
         }
+        
+        const handleEnded=(e)=>{
+            e.stopPropagation()
+            const index = playlist.findIndex((e) => musicMeta.id == e.id )
+            const nextIndex = index + 1
+            if(!playlist[nextIndex]){
+                if(musicState.loop == 2){
+                    return setMusicMeta(playlist[0])
+                }
+                return;
+            }
+                setMusicMeta(playlist[nextIndex])
+            }
         return (
             <div className='wrap' style={style}>
             <input type='file' id='inputFile' onChange={handleFile} multiple/>
             <label for='inputFile'>
             <Visualize setting={visualizeSet} color={color.sub} meta={musicMeta}></Visualize>
             </label>
-            <audio ref={audioRef} id='audio'></audio>
+            <audio ref={audioRef} id='audio' onEnded={handleEnded}></audio>
             <Controller playlist={playlist} 
                         audio={audioRef} 
                         data={musicMeta} 
                         color={color}
-                        setMusicMeta={setMusicMeta}/>
+                        setMusicMeta={setMusicMeta}
+                        musicState={musicState}
+                        setMusicState={setMusicState}
+                        handleNext={handleEnded}
+                        setPlayList={setPlayList}/>
             </div>
         )
     
